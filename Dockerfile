@@ -13,67 +13,54 @@ FROM ubuntu:16.04
 
 ################################################################################
 ### set author
-MAINTAINER Nils Paulhe <nils.paulhe@inra.fr>
+MAINTAINER PhenoMeNal-H2020 Project ( phenomenal-h2020-users@googlegroups.com )
 
 ################################################################################
-### install third part tools: r-base, system libraries and Git
-RUN echo "deb http://cran.univ-paris1.fr/bin/linux/ubuntu trusty/" >> /etc/apt/sources.list && \
-    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E084DAB9 && \
-    apt-get update && \
-    apt-get -y upgrade && \
-    apt-get install -y \ 
-    r-base \
-    libcurl4-openssl-dev \
-    libxml2-dev \
-    git && \ 
-    apt-get clean && \
-    apt-get autoremove -y && \
+### set metadata
+ENV TOOL_NAME=qualitymetrics
+ENV TOOL_VERSION="v2.2.6"
+# ENV TOOL_VERSION="phenomenal_2017.12.08" ### MISSING TAG (YET)
+ENV CONTAINER_VERSION=0.2
+ENV CONTAINER_GITHUB=https://github.com/phnmnl/container-qualitymetrics
+
+LABEL version="${CONTAINER_VERSION}"
+LABEL software.version="${TOOL_VERSION}"
+LABEL software="${TOOL_NAME}"
+LABEL base.image="ubuntu:16.04"
+LABEL description="A filter for samples and/or variables."
+LABEL website="${CONTAINER_GITHUB}"
+LABEL documentation="${CONTAINER_GITHUB}"
+LABEL license="${CONTAINER_GITHUB}"
+LABEL tags="Metabolomics"
+
+################################################################################
+# Install
+RUN echo "deb http://cran.univ-paris1.fr/bin/linux/ubuntu trusty/" >> /etc/apt/sources.list  && \
+    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E084DAB9  && \
+    apt-get update  && \
+    apt-get -y upgrade  && \
+    apt-get install --no-install-recommends -y r-base && \
+    apt-get install --no-install-recommends -y libcurl4-openssl-dev && \
+    apt-get install --no-install-recommends -y libxml2-dev && \
+    apt-get install --no-install-recommends -y git  && \
+    git clone --recurse-submodules --single-branch -b ${TOOL_VERSION} https://github.com/workflow4metabolomics/qualitymetrics.git /files/qualitymetrics  && \
+    echo "r <- getOption('repos'); r['CRAN'] <- 'http://cran.us.r-project.org'; options(repos = r);" > ~/.Rprofile  && \
+    Rscript -e "install.packages('batch', dep=TRUE)" && \
+    Rscript -e "source('http://www.bioconductor.org/biocLite.R'); biocLite('ropls')" && \
+    apt-get purge -y git && \
+    apt-get clean  && \
+    apt-get autoremove -y  && \
     rm -rf /var/lib/{apt,dpkg,cache,log}/ /tmp/* /var/tmp/*
 
-################################################################################
-### install R libraries
+# Set authorizations
+RUN ["chmod", "a+x", "/files/qualitymetrics/qualitymetrics_wrapper.R"]
 
-# init R env. (Docker)
-RUN echo "r <- getOption('repos'); r['CRAN'] <- 'http://cran.us.r-project.org'; options(repos = r);" > ~/.Rprofile
-
-# install R libs
-RUN Rscript -e "install.packages('batch', dep=TRUE)"
-RUN Rscript -e "source('http://www.bioconductor.org/biocLite.R'); biocLite('ropls')"
-
-################################################################################
-### set script / container metadata
-
-ENV TOOL_VERSION="v2.2.6"
-
-LABEL tool="qualitymetrics"
-LABEL tool.version="${TOOL_VERSION}"
-LABEL version="0.1"
-
-################################################################################
-### install core scripts
-
-# init. WORKDIR
-RUN [ "mkdir", "-p", "/usr/local/src/scripts/" ]
-
-# set WORKDIR
-WORKDIR "/usr/local/src/scripts/"
-
-# get script using `git clone` command
-RUN git clone https://github.com/workflow4metabolomics/qualitymetrics.git && \
-  cd qualitymetrics && \
-  git checkout tags/${TOOL_VERSION} && \
-  git submodule update --init --recursive
-  
-# set authorizations
-RUN ["chmod", "a+x", "/usr/local/src/scripts/qualitymetrics/qualitymetrics_wrapper.R"]
-
-# make tool accessible through PATH
-ENV PATH = $PATH:/usr/local/src/scripts/qualitymetrics
+# Make tool accessible through PATH
+ENV PATH = $PATH:/files/qualitymetrics
 
 ################################################################################
 ### Define script ENTRYPOINT or container CMD
-#ENTRYPOINT ["/usr/local/src/scripts/qualitymetrics/qualitymetrics_wrapper.R"]
-#CMD ["Rscript", "qualitymetrics_wrapper.R"]
+ENTRYPOINT ["/files/qualitymetrics/qualitymetrics_wrapper.R"]
 
 ### [END]
 ################################################################################
