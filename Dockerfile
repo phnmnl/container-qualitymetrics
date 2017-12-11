@@ -18,8 +18,8 @@ MAINTAINER PhenoMeNal-H2020 Project ( phenomenal-h2020-users@googlegroups.com )
 ################################################################################
 ### set metadata
 ENV TOOL_NAME=qualitymetrics
-ENV TOOL_VERSION="v2.2.6"
-# ENV TOOL_VERSION="phenomenal_2017.12.08" ### MISSING TAG (YET)
+ENV TOOL_VERSION="master"
+# ENV TOOL_VERSION="phenomenal_2017.12.08" ### MISSING TAG (YET) // "v2.2.6"
 ENV CONTAINER_VERSION=0.2
 ENV CONTAINER_GITHUB=https://github.com/phnmnl/container-qualitymetrics
 
@@ -42,12 +42,14 @@ RUN echo "deb http://cran.univ-paris1.fr/bin/linux/ubuntu trusty/" >> /etc/apt/s
     apt-get install --no-install-recommends -y r-base && \
     apt-get install --no-install-recommends -y libcurl4-openssl-dev && \
     apt-get install --no-install-recommends -y libxml2-dev && \
-    apt-get install --no-install-recommends -y git  && \
+    apt-get install --no-install-recommends -y git && \
+    apt-get install --no-install-recommends -y make && \
+    apt-get install --no-install-recommends -y gcc && \
     git clone --recurse-submodules --single-branch -b ${TOOL_VERSION} https://github.com/workflow4metabolomics/qualitymetrics.git /files/qualitymetrics  && \
     echo "r <- getOption('repos'); r['CRAN'] <- 'http://cran.us.r-project.org'; options(repos = r);" > ~/.Rprofile  && \
     Rscript -e "install.packages('batch', dep=TRUE)" && \
     Rscript -e "source('http://www.bioconductor.org/biocLite.R'); biocLite('ropls')" && \
-    apt-get purge -y git && \
+    apt-get purge -y git make gcc && \
     apt-get clean  && \
     apt-get autoremove -y  && \
     rm -rf /var/lib/{apt,dpkg,cache,log}/ /tmp/* /var/tmp/*
@@ -64,3 +66,18 @@ ENTRYPOINT ["/files/qualitymetrics/qualitymetrics_wrapper.R"]
 
 ### [END]
 ################################################################################
+
+# 
+# # LABO
+# # ENTRYPOINT ["echo", "'${*}'"]
+
+# #####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# # Make tool accessible through PATH
+# COPY galaxy_bridge.bash /files/qualitymetrics/
+# RUN ["chmod", "a+x", "/files/qualitymetrics/galaxy_bridge.bash"]
+# ENV PATH = $PATH:/files/qualitymetrics
+# 
+# ################################################################################
+# ### Define script ENTRYPOINT or container CMD
+# ENTRYPOINT ["/files/qualitymetrics/galaxy_bridge.bash"]
+# #####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

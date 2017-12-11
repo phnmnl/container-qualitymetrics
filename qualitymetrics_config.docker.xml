@@ -9,8 +9,8 @@
     <exit_code range="1:" level="fatal" />
   </stdio>
   
-  <command><![CDATA[
-  Rscript /usr/local/src/scripts/qualitymetrics/qualitymetrics_wrapper.R
+  <command>
+  /usr/bin/Rscript /files/qualitymetrics/qualitymetrics_wrapper.R
   dataMatrix_in "$dataMatrix_in"
   sampleMetadata_in "$sampleMetadata_in"
   variableMetadata_in "$variableMetadata_in"
@@ -34,7 +34,7 @@
   variableMetadata_out "$variableMetadata_out"
   figure "$figure"
   information "$information"
-  ]]></command>
+  </command>
   
   <inputs>
     <param name="dataMatrix_in" type="data" label="Data matrix file" help="" format="tabular" />
