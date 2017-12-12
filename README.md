@@ -3,7 +3,7 @@
 ![Logo](w4m.png)
 
 # W4M - Quality Metrics
-Version: v2.2.6
+Version: phenomenal_2017.12.12
 
 ## Short description
 
