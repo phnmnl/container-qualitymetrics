@@ -18,7 +18,7 @@ MAINTAINER PhenoMeNal-H2020 Project ( phenomenal-h2020-users@googlegroups.com )
 ################################################################################
 ### set metadata
 ENV TOOL_NAME=qualitymetrics
-ENV TOOL_VERSION=2.2.10
+ENV TOOL_VERSION=2.2.11
 ENV CONTAINER_VERSION=1.0
 ENV CONTAINER_GITHUB=https://github.com/phnmnl/container-qualitymetrics
 
