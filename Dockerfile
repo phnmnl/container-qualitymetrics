@@ -18,7 +18,7 @@ MAINTAINER PhenoMeNal-H2020 Project ( phenomenal-h2020-users@googlegroups.com )
 ################################################################################
 ### set metadata
 ENV TOOL_NAME=qualitymetrics
-ENV TOOL_VERSION="phenomenal_2018.02.20_2"
+ENV TOOL_VERSION=2.2.10
 ENV CONTAINER_VERSION=0.2
 ENV CONTAINER_GITHUB=https://github.com/phnmnl/container-qualitymetrics
 
@@ -44,7 +44,7 @@ RUN echo "deb http://cran.univ-paris1.fr/bin/linux/ubuntu trusty/" >> /etc/apt/s
     apt-get install --no-install-recommends -y git && \
     apt-get install --no-install-recommends -y make && \
     apt-get install --no-install-recommends -y gcc && \
-    git clone --recurse-submodules --single-branch -b ${TOOL_VERSION} https://github.com/workflow4metabolomics/qualitymetrics.git /files/qualitymetrics  && \
+    git clone --recurse-submodules --single-branch -b v${TOOL_VERSION} https://github.com/workflow4metabolomics/qualitymetrics.git /files/qualitymetrics  && \
     echo "r <- getOption('repos'); r['CRAN'] <- 'http://cran.us.r-project.org'; options(repos = r);" > ~/.Rprofile  && \
     Rscript -e "install.packages('batch', dep=TRUE)" && \
     Rscript -e "source('http://www.bioconductor.org/biocLite.R'); biocLite('ropls')" && \
